@@ -1,0 +1,26 @@
+name: switch_camera
+description: "A Flutter library that provides a Dart FFI interface to interact with camera and audio recording functionalities from Rust."
+version: 0.0.1
+repository:
+
+environment:
+  sdk: '>=3.4.3 <4.0.0'
+  flutter: '>=3.3.0'
+
+dependencies:
+  ffi: ^2.1.2
+  path: ^1.9.0
+  flutter:
+    sdk: flutter
+  plugin_platform_interface: ^2.0.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  plugin:
+    platforms:
+      linux:
+        pluginClass: SwitchCameraPlugin
