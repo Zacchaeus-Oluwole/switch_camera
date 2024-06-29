@@ -10,7 +10,7 @@ String getLibraryPath() {
     '.pub-cache',
     'hosted',
     'pub.dev',
-    'switch_camera-0.0.1',
+    'switch_camera-0.0.2',
     'lib',
     'src',
   );
@@ -44,7 +44,6 @@ final DynamicLibrary _lib = Platform.isLinux
         getLibraryPath()) // Update with the actual name of the compiled Rust library
     : DynamicLibrary.process();
 
-
 base class FrCamera extends Opaque {}
 
 typedef FrCameraNew = Pointer<FrCamera> Function();
@@ -61,23 +60,26 @@ typedef FrCameraReleaseCamDart = void Function(Pointer<FrCamera>);
 typedef FrCameraCamOpenRust = Void Function(Pointer<FrCamera>, Int32);
 typedef FrCameraCamOpenDart = void Function(Pointer<FrCamera>, int);
 
-typedef FrCameraRustCamRust = Void Function(Pointer<FrCamera>, Pointer<Uint8>, Pointer<Int32>);
-typedef FrCameraRustCamDart = void Function(Pointer<FrCamera>, Pointer<Uint8>, Pointer<Int32>);
+typedef FrCameraRustCamRust = Void Function(
+    Pointer<FrCamera>, Pointer<Uint8>, Pointer<Int32>);
+typedef FrCameraRustCamDart = void Function(
+    Pointer<FrCamera>, Pointer<Uint8>, Pointer<Int32>);
 
-typedef FrCameraStartVideoWriterRust = Void Function(Pointer<FrCamera>, Pointer<Utf8>, Double, Int32, Int32);
-typedef FrCameraStartVideoWriterDart = void Function(Pointer<FrCamera>, Pointer<Utf8>, double, int, int);
+typedef FrCameraStartVideoWriterRust = Void Function(
+    Pointer<FrCamera>, Pointer<Utf8>, Double, Int32, Int32);
+typedef FrCameraStartVideoWriterDart = void Function(
+    Pointer<FrCamera>, Pointer<Utf8>, double, int, int);
 
-typedef FrCameraStartAVideoWriterRust = Void Function(Pointer<FrCamera>, Double, Int32, Int32);
-typedef FrCameraStartAVideoWriterDart = void Function(Pointer<FrCamera>, double, int, int);
+typedef FrCameraStartAVideoWriterRust = Void Function(
+    Pointer<FrCamera>, Double, Int32, Int32);
+typedef FrCameraStartAVideoWriterDart = void Function(
+    Pointer<FrCamera>, double, int, int);
 
 typedef FrCameraWriteFrameRust = Void Function(Pointer<FrCamera>);
 typedef FrCameraWriteFrameDart = void Function(Pointer<FrCamera>);
 
-
-
-final FrCameraNew frCameraNew = _lib
-    .lookup<NativeFunction<FrCameraNew>>('fr_camera_new')
-    .asFunction();
+final FrCameraNew frCameraNew =
+    _lib.lookup<NativeFunction<FrCameraNew>>('fr_camera_new').asFunction();
 
 final FrCameraFreeDart frCameraFree = _lib
     .lookup<NativeFunction<FrCameraFreeRust>>('fr_camera_free')
@@ -86,7 +88,7 @@ final FrCameraFreeDart frCameraFree = _lib
 final FrCameraGetDevicesDart frCameraGetDevices = _lib
     .lookup<NativeFunction<FrCameraGetDevicesRust>>('fr_camera_get_devices')
     .asFunction();
-    
+
 final FrCameraReleaseCamDart frCameraReleaseCam = _lib
     .lookup<NativeFunction<FrCameraReleaseCamRust>>('fr_camera_release_cam')
     .asFunction();
@@ -104,106 +106,106 @@ final FrCameraRustCamDart frCameraRustCamFlip = _lib
     .asFunction();
 
 final FrCameraStartVideoWriterDart frCameraStartVideoWriter = _lib
-    .lookup<NativeFunction<FrCameraStartVideoWriterRust>>('fr_camera_start_video_writer')
+    .lookup<NativeFunction<FrCameraStartVideoWriterRust>>(
+        'fr_camera_start_video_writer')
     .asFunction();
 
 final FrCameraStartAVideoWriterDart frCameraStartAVideoWriter = _lib
-    .lookup<NativeFunction<FrCameraStartAVideoWriterRust>>('fr_camera_start_a_video_writer')
+    .lookup<NativeFunction<FrCameraStartAVideoWriterRust>>(
+        'fr_camera_start_a_video_writer')
     .asFunction();
-    
+
 final FrCameraWriteFrameDart frCameraWriteFrame = _lib
     .lookup<NativeFunction<FrCameraWriteFrameRust>>('fr_camera_write_frame')
     .asFunction();
 
 final FrCameraWriteFrameDart frCameraWriteFrameFlip = _lib
-    .lookup<NativeFunction<FrCameraWriteFrameRust>>('fr_camera_write_frame_flip')
+    .lookup<NativeFunction<FrCameraWriteFrameRust>>(
+        'fr_camera_write_frame_flip')
     .asFunction();
 
-
 class Camera {
-    Pointer<FrCamera> _camera;
+  Pointer<FrCamera> _camera;
 
-    Camera() : _camera = frCameraNew();
+  Camera() : _camera = frCameraNew();
 
-    List<int> getDevices(int limit) {
-        final devices = malloc<Int32>(limit);
-        final count = frCameraGetDevices(limit, devices);
-        final deviceList = devices.asTypedList(count).toList();
-        malloc.free(devices);
-        return deviceList;
-    }
+  List<int> getDevices(int limit) {
+    final devices = malloc<Int32>(limit);
+    final count = frCameraGetDevices(limit, devices);
+    final deviceList = devices.asTypedList(count).toList();
+    malloc.free(devices);
+    return deviceList;
+  }
 
-    void open(int index) {
-        frCameraCamOpen(_camera, index);
-    }
+  void open(int index) {
+    frCameraCamOpen(_camera, index);
+  }
 
-    void release() {
-        frCameraReleaseCam(_camera);
-    }
+  void release() {
+    frCameraReleaseCam(_camera);
+  }
 
-    Uint8List captureFrame() {
-        final buffer = malloc<Uint8>(1024 * 1024); // Allocate 1MB buffer
-        final bufferLen = malloc<Int32>();
-        frCameraRustCam(_camera, buffer, bufferLen);
-        final len = bufferLen.value;
-        final frame = Uint8List.fromList(buffer.asTypedList(len));
-        malloc.free(buffer);
-        malloc.free(bufferLen);
-        return frame;
-    }
+  Uint8List captureFrame() {
+    final buffer = malloc<Uint8>(1024 * 1024); // Allocate 1MB buffer
+    final bufferLen = malloc<Int32>();
+    frCameraRustCam(_camera, buffer, bufferLen);
+    final len = bufferLen.value;
+    final frame = Uint8List.fromList(buffer.asTypedList(len));
+    malloc.free(buffer);
+    malloc.free(bufferLen);
+    return frame;
+  }
 
-    Uint8List captureFrameFlip() {
-        final buffer = malloc<Uint8>(1024 * 1024); // Allocate 1MB buffer
-        final bufferLen = malloc<Int32>();
-        frCameraRustCamFlip(_camera, buffer, bufferLen);
-        final len = bufferLen.value;
-        final frame = Uint8List.fromList(buffer.asTypedList(len));
-        malloc.free(buffer);
-        malloc.free(bufferLen);
-        return frame;
-    }
+  Uint8List captureFrameFlip() {
+    final buffer = malloc<Uint8>(1024 * 1024); // Allocate 1MB buffer
+    final bufferLen = malloc<Int32>();
+    frCameraRustCamFlip(_camera, buffer, bufferLen);
+    final len = bufferLen.value;
+    final frame = Uint8List.fromList(buffer.asTypedList(len));
+    malloc.free(buffer);
+    malloc.free(bufferLen);
+    return frame;
+  }
 
-    // streamFrame function returns a Stream<Uint8List>
-    Stream<Uint8List> streamFrames() async* {
-      while (true) {
-        yield captureFrame();
-        // Simulate a delay for real-time data streaming
-        await Future.delayed(const Duration(milliseconds: 100));
-      }
+  // streamFrame function returns a Stream<Uint8List>
+  Stream<Uint8List> streamFrames() async* {
+    while (true) {
+      yield captureFrame();
+      // Simulate a delay for real-time data streaming
+      await Future.delayed(const Duration(milliseconds: 100));
     }
+  }
 
-    Stream<Uint8List> streamFramesFlip() async* {
-      while (true) {
-        yield captureFrameFlip();
-        // Simulate a delay for real-time data streaming
-        await Future.delayed(const Duration(milliseconds: 100));
-      }
+  Stream<Uint8List> streamFramesFlip() async* {
+    while (true) {
+      yield captureFrameFlip();
+      // Simulate a delay for real-time data streaming
+      await Future.delayed(const Duration(milliseconds: 100));
     }
+  }
 
-    void startVideoWriter(String filename, double fps, int width, int height) {
-        final filenamePtr = filename.toNativeUtf8();
-        frCameraStartVideoWriter(_camera, filenamePtr, fps, width, height);
-        malloc.free(filenamePtr);
-    }
-    void startAVideoWriter( double fps, int width, int height) {
-        frCameraStartAVideoWriter(_camera, fps, width, height);
-    }
+  void startVideoWriter(String filename, double fps, int width, int height) {
+    final filenamePtr = filename.toNativeUtf8();
+    frCameraStartVideoWriter(_camera, filenamePtr, fps, width, height);
+    malloc.free(filenamePtr);
+  }
 
-    void writeFrame() {
-        frCameraWriteFrame(_camera);
-    }
+  void startAVideoWriter(double fps, int width, int height) {
+    frCameraStartAVideoWriter(_camera, fps, width, height);
+  }
 
-    void writeFrameFlip() {
-        frCameraWriteFrameFlip(_camera);
-    }
+  void writeFrame() {
+    frCameraWriteFrame(_camera);
+  }
 
-    void dispose() {
-        frCameraFree(_camera);
-    }
+  void writeFrameFlip() {
+    frCameraWriteFrameFlip(_camera);
+  }
+
+  void dispose() {
+    frCameraFree(_camera);
+  }
 }
-
-
-
 
 // ++++++++++++++++++++++++ AUDIO ++++++++++++++++++++++++++++++
 
@@ -213,28 +215,33 @@ base class AudioRecorder extends Opaque {}
 
 typedef NativeNewAudioRecorder = Pointer<AudioRecorder> Function();
 typedef NewAudioRecorder = Pointer<AudioRecorder> Function();
-final NewAudioRecorder newAudioRecorder = _lib
-    .lookupFunction<NativeNewAudioRecorder, NewAudioRecorder>("new_audio_recorder");
+final NewAudioRecorder newAudioRecorder =
+    _lib.lookupFunction<NativeNewAudioRecorder, NewAudioRecorder>(
+        "new_audio_recorder");
 
 typedef NativeStartRecording = Void Function(Pointer<AudioRecorder>);
 typedef StartRecording = void Function(Pointer<AudioRecorder>);
-final StartRecording audioRecorderStartRecording = _lib
-    .lookupFunction<NativeStartRecording, StartRecording>("audio_recorder_start_recording");
+final StartRecording audioRecorderStartRecording =
+    _lib.lookupFunction<NativeStartRecording, StartRecording>(
+        "audio_recorder_start_recording");
 
 typedef NativeStopRecording = Void Function(Pointer<AudioRecorder>);
 typedef StopRecording = void Function(Pointer<AudioRecorder>);
-final StopRecording audioRecorderStopRecording = _lib
-    .lookupFunction<NativeStopRecording, StopRecording>("audio_recorder_stop_recording");
+final StopRecording audioRecorderStopRecording =
+    _lib.lookupFunction<NativeStopRecording, StopRecording>(
+        "audio_recorder_stop_recording");
 
 typedef NativePauseRecording = Void Function(Pointer<AudioRecorder>);
 typedef PauseRecording = void Function(Pointer<AudioRecorder>);
-final PauseRecording audioRecorderPauseRecording = _lib
-    .lookupFunction<NativePauseRecording, PauseRecording>("audio_recorder_pause_recording");
+final PauseRecording audioRecorderPauseRecording =
+    _lib.lookupFunction<NativePauseRecording, PauseRecording>(
+        "audio_recorder_pause_recording");
 
 typedef NativeResumeRecording = Void Function(Pointer<AudioRecorder>);
 typedef ResumeRecording = void Function(Pointer<AudioRecorder>);
-final ResumeRecording audioRecorderResumeRecording = _lib
-    .lookupFunction<NativeResumeRecording, ResumeRecording>("audio_recorder_resume_recording");
+final ResumeRecording audioRecorderResumeRecording =
+    _lib.lookupFunction<NativeResumeRecording, ResumeRecording>(
+        "audio_recorder_resume_recording");
 
 // Dart wrapper for interacting with Rust FFI
 
@@ -269,11 +276,12 @@ typedef MergeAudioVideo = Pointer<Utf8> Function(Pointer<Utf8>);
 typedef NativeFreeString = Void Function(Pointer<Utf8>);
 typedef FreeString = void Function(Pointer<Utf8>);
 
-final MergeAudioVideo mergeAudioVideo = _lib
-    .lookupFunction<NativeMergeAudioVideo, MergeAudioVideo>("merge_audio_video");
+final MergeAudioVideo mergeAudioVideo =
+    _lib.lookupFunction<NativeMergeAudioVideo, MergeAudioVideo>(
+        "merge_audio_video");
 
-final FreeString freeString = _lib
-    .lookupFunction<NativeFreeString, FreeString>("free_string");
+final FreeString freeString =
+    _lib.lookupFunction<NativeFreeString, FreeString>("free_string");
 
 String mergeCamAudioVideo(String outputFilePath) {
   final outputFilePathPtr = outputFilePath.toNativeUtf8();
