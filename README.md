@@ -1,6 +1,6 @@
 # switch_camera
 
-**`switch_camera`** is a Dart library that provides a Dart FFI interface to interact with camera and audio recording functionalities from Rust. It supports video capturing, frame streaming, and video writing, as well as audio recording and merging video with audio.
+**`switch_camera`** is a Dart library that provides a Dart FFI interface to interact with camera and audio recording functionalities from Rust. It supports video capturing, frame streaming, and video writing, as well as audio recording and merging video with audio. I used the switch_camera library to build a desktop application named Zed Camera, and you can watch a demonstration of it on [YouTube](https://youtu.be/x9PenN0iiuo?si=ja1Dcs3kwMr2mgSe). This library is particularly useful in IoT, CCTV, and industrial contexts where multiple camera inputs and reliable audio-visual recording are essential.
 
 ## Features
 
@@ -19,13 +19,24 @@
 
 ## Installation
 
-To install **`switch_camera`**, use either `flutter pub add` or `dart pub add`, depending on your project type:
+To install **`switch_camera`**, use `flutter pub add`:
 
 ### Flutter
 
 ```bash
 flutter pub add switch_camera
 ```
+
+## Dependencies
+
+### Linux - Ubuntu:
+
+- `sudo apt-get update`
+- Getting OpenCV: `sudo apt-get install libopencv-dev clang libclang-dev`
+- Install JACK development files: `sudo apt-get install libjack-jackd2-dev`
+- Install ALSA development files: `sudo apt-get install libasound2-dev`
+- Install FFmpeg: `sudo apt-get install ffmpeg`
+
 
 ## Usage
 ### Camera
@@ -35,7 +46,7 @@ import 'package:switch_camera/switch_camera.dart';
 void main() {
   final camera = Camera();
 
-  // List available devices
+  // List available 10 devices
   final devices = camera.getDevices(10);
   print('Available devices: $devices');
 
@@ -51,14 +62,10 @@ void main() {
   print('Captured flipped frame: ${flippedFrame.length} bytes');
 
   // Stream frames
-  camera.streamFrames().listen((frame) {
-    print('Streaming frame: ${frame.length} bytes');
-  });
+  camera.streamFrames();
 
   // Stream flipped frames
-  camera.streamFramesFlip().listen((frame) {
-    print('Streaming flipped frame: ${frame.length} bytes');
-  });
+  camera.streamFramesFlip();
 
   // Start video writer
   camera.startVideoWriter('output.mp4', 30.0, 1920, 1080);

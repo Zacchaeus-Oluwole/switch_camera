@@ -10,7 +10,7 @@ String getLibraryPath() {
     '.pub-cache',
     'hosted',
     'pub.dev',
-    'switch_camera-0.0.2',
+    'switch_camera-0.0.3',
     'lib',
     'src',
   );
